@@ -1,12 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout, setCredential } from "../../features/auth/authSlice";
+import { getAuthToken } from "../../utils/authUtils";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: "https://api.escuelajs.co/api/v1/auth",
-  credentials: "include",
-  prepareHeaders: (headers, {getState}) => {
+//   credentials: "include",
+  prepareHeaders: (headers, ) => {
     
-    const token = getState().auth.token
+    // const token = getState().auth.token
+    const token = getAuthToken()
     console.log(token)
     if (token) {
         headers.set("authorization", `Bearer ${token}`)
@@ -18,6 +20,7 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithReAuth = async (args, api, options) => {
     let result = await baseQuery(args,api,options);
+    console.log(result)
     if(result?.error?.originalStatus === 403) {
         console.log('sending refresh token')
         const refreshResult = await baseQuery('/refresh-token', api , options);

@@ -4,6 +4,7 @@ import { useLoginMutation } from "./authApiSlice"
 import { useDispatch } from "react-redux"
 import { setCredential } from "./authSlice"
 import { store } from "../../app/store"
+import { setAuthToken } from "../../utils/authUtils"
 
 const Login = () => {
     const userRef = useRef()
@@ -29,9 +30,10 @@ const Login = () => {
         e.preventDefault()
         try {
             const userData = await login({email,password}).unwrap()
-            console.log(userData)
+            
             dispatch(setCredential({...userData,email}))
             console.log(store.getState().auth)
+            setAuthToken(userData.access_token)
             setEmail('')
             setPassword('')
             navigate('/welcome')
