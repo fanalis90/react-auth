@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { logout, setCredential } from "../../features/auth/authSlice";
-import { getAuthToken } from "../../utils/authUtils";
+import { logout, selectCurrentToken, setCredential } from "../../features/auth/authSlice";
+import { getAuthToken, setAuthToken } from "../../utils/authUtils";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: "https://api.escuelajs.co/api/v1/auth",
@@ -24,11 +24,16 @@ const baseQueryWithReAuth = async (args, api, options) => {
     if(result?.error?.originalStatus === 403) {
         console.log('sending refresh token')
         const refreshResult = await baseQuery('/refresh-token', api , options);
-        console.log(refreshResult);
         if(refreshResult?.data){
             const user = api.getState().auth.user
             api.dispatch(setCredential({ ...refreshResult.data, user}))
-            result = await(baseQuery(args,api,options))
+
+            setAuthToken(refreshResult.data.access_token) //set to cookie
+            
+            result = await baseQuery(args, api, {
+              ...options,
+              body: JSON.stringify({ refresh_token: selectCurrentToken() }),
+            });
         }else {
             api.dispatch(logout());
         }    

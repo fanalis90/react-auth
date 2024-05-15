@@ -1,3 +1,4 @@
+import { removeAuthToken } from "../../utils/authUtils";
 import { useGetUsersQuery } from "./userApiSlice";
 import { Link } from "react-router-dom";
 
@@ -9,7 +10,9 @@ const UserProfile = () => {
     isError,
     error,
   } = useGetUsersQuery();
-
+const handleLogout = ( )=> {
+  removeAuthToken()
+}
   let content;
   if (isLoading) {
     content = <p>Loading...</p>;
@@ -40,6 +43,7 @@ const UserProfile = () => {
         </main>
 
         <Link to="/welcome">Back to Welcome</Link>
+        <Link onClick={handleLogout} to="/">Logout</Link>
       </section>
     );
   } else if (isError) {
